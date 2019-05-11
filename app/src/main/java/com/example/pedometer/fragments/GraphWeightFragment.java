@@ -1,0 +1,172 @@
+package com.example.pedometer.fragments;
+
+
+import android.database.Cursor;
+import android.graphics.Color;
+import android.os.Bundle;
+import android.provider.BaseColumns;
+import android.text.Editable;
+import android.text.InputType;
+import android.text.format.DateFormat;
+import android.view.ActionMode;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Toast;
+
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.CursorLoader;
+import androidx.loader.content.Loader;
+
+
+import com.example.pedometer.Defaults;
+import com.example.pedometer.R;
+import com.example.pedometer.provider.PedometerContentProvider;
+import com.example.pedometer.provider.Provider;
+
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+
+import lecho.lib.hellocharts.formatter.SimpleAxisValueFormatter;
+import lecho.lib.hellocharts.listener.LineChartOnValueSelectListener;
+import lecho.lib.hellocharts.model.Axis;
+import lecho.lib.hellocharts.model.Line;
+import lecho.lib.hellocharts.model.LineChartData;
+import lecho.lib.hellocharts.model.PointValue;
+import lecho.lib.hellocharts.view.LineChartView;
+
+// based on https://github.com/doubleblacksoftware/simple-weight-tracker
+public class GraphWeightFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+
+    private LineChartView hellochart;
+
+    public GraphWeightFragment() {
+
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.fragment_graph_weight, container, false);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
+
+        hellochart = (LineChartView) view.findViewById(R.id.hellochart);
+        getLoaderManager().initLoader(4, null, this);
+        return view;
+    }
+
+    private void updateGraph(Cursor cursor) {
+        List<PointValue> values = new ArrayList<>();
+        cursor.moveToFirst();
+        long time;
+
+        while (cursor.isAfterLast() == false) {
+            time = cursor.getLong(cursor.getColumnIndex(Provider.Pedometer.TIMESTAMP)) ;
+            float value = cursor.getFloat(cursor.getColumnIndex(Provider.Pedometer.VALUE));
+            values.add(new PointValue(time, value));
+            cursor.moveToNext();
+        }
+
+        Line line = new Line(values).setColor(Color.parseColor("#44a134")).setCubic(false);
+        line.setFilled(true);
+        line.setHasLabels(true);
+        List<Line> lines = new ArrayList<Line>();
+        lines.add(line);
+
+        LineChartData data = new LineChartData();
+        data.setLines(lines);
+
+        Axis timeAxis = new Axis();
+        //timeAxis.setName("");
+        //timeAxis.setTextColor(ChartUtils.COLOR_ORANGE);
+        timeAxis.setMaxLabelChars(5);
+        timeAxis.setFormatter(new TimestampAxisFormatter());
+        timeAxis.setHasLines(true);
+        timeAxis.setHasTiltedLabels(true);
+        data.setAxisXBottom(timeAxis);
+
+        Axis weightAxis = new Axis();
+        //weightAxis.setName("");
+        //weightAxis.setTextColor(ChartUtils.COLOR_GREEN);
+        weightAxis.setMaxLabelChars(7);
+        weightAxis.setFormatter(new SimpleAxisValueFormatter().setAppendedText(" kg".toCharArray()));
+        weightAxis.setHasLines(true);
+        weightAxis.setHasTiltedLabels(true);
+        data.setAxisYLeft(weightAxis);
+
+        hellochart.setLineChartData(data);
+        hellochart.setOnValueTouchListener(new ValueTouchListener());
+
+        hellochart.invalidate();
+    }
+
+
+
+
+    private class ValueTouchListener implements LineChartOnValueSelectListener {
+
+        @Override
+        public void onValueSelected(int lineIndex, int pointIndex, PointValue value) {
+            Calendar cal = Calendar.getInstance();
+            SimpleDateFormat sdf = new SimpleDateFormat("M/dd/yy h:mm a");
+            cal.setTimeInMillis((long)value.getX());
+            Toast.makeText(getActivity(), "Timestamp: " + sdf.format(cal.getTime()) + " \nWeight: " + value.getY(), Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void onValueDeselected() {
+            // TODO Auto-generated method stub
+
+        }
+
+    }
+
+    private static class TimestampAxisFormatter extends SimpleAxisValueFormatter {
+
+        private Calendar cal = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("M/dd");
+
+        @Override
+        public int formatValueForAutoGeneratedAxis(char[] formattedValue, float value, int autoDecimalDigits) {
+            cal.setTimeInMillis((long)value);
+            char[] timestampA = sdf.format(cal.getTime()).toCharArray();
+            System.arraycopy(timestampA, 0, formattedValue, formattedValue.length - timestampA.length, timestampA.length);
+            return timestampA.length;
+        }
+    }
+
+
+
+    @NonNull
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
+        String[] projection = {BaseColumns._ID, Provider.Pedometer.VALUE, Provider.Pedometer.TIMESTAMP };
+
+        CursorLoader cursorLoader = new CursorLoader(getActivity(),
+                PedometerContentProvider.CONTENT_URI_WEIGHT, projection, null, null, null);
+        return cursorLoader;
+    }
+
+    @Override
+    public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
+        updateGraph(data);
+    }
+
+    @Override
+    public void onLoaderReset(@NonNull Loader<Cursor> loader) {
+
+    }
+}
