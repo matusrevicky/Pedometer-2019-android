@@ -8,9 +8,14 @@
     android:layout_gravity="center"
     app:cardBackgroundColor="#1BACD8">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5" />
 
         <TextView
             android:id="@+id/StepItemTextView1"
@@ -19,14 +24,17 @@
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
             android:background="?android:attr/activatedBackgroundIndicator"
-            android:drawableLeft="@drawable/ic_calendar_24dp"
+            android:drawableStart="@drawable/ic_calendar_24dp"
             android:gravity="center"
             android:text="20/12/2018"
             android:textSize="16sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+
             tools:layout_editor_absoluteX="8dp" />
 
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
 
         <TextView
             android:id="@+id/StepItemTextView6"
@@ -37,16 +45,18 @@
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
             android:background="?android:attr/activatedBackgroundIndicator"
-            android:drawableLeft="@drawable/ic_person_black_24dp"
+            android:drawableStart="@drawable/ic_person_black_24dp"
             android:gravity="center"
             android:text="50000"
             android:textSize="16sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/StepItemTextView1"
-            app:layout_constraintTop_toTopOf="parent" />
+             />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5" />
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
 
 
 </androidx.cardview.widget.CardView>

@@ -11,77 +11,75 @@
         android:id="@+id/chart"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_toRightOf="@id/linear"></lecho.lib.hellocharts.view.PieChartView>
+        android:layout_toEndOf="@id/linear"></lecho.lib.hellocharts.view.PieChartView>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/linear"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_alignParentBottom="true"
-        app:layout_constraintEnd_toStartOf="@+id/chart">
+        app:layout_constraintEnd_toStartOf="@+id/chart"
+        android:orientation="vertical">
 
+
+        <Space
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"/>
         <TextView
             android:id="@+id/textViewDistance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="32dp"
 
-            android:layout_marginEnd="8dp"
-            android:drawableLeft="@drawable/ic_directions_run_black_24dp"
+            android:drawableStart="@drawable/ic_directions_run_black_24dp"
             android:gravity="center"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            />
 
+        <Space
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"/>
         <TextView
             android:id="@+id/textViewCalories"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
 
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
-            android:drawableLeft="@drawable/ic_fire_black_24dp"
+            android:drawableStart="@drawable/ic_fire_black_24dp"
             android:gravity="center"
-            app:layout_constraintBottom_toTopOf="@+id/textViewTime"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textViewDistance"
-            app:layout_constraintVertical_bias="0.679" />
-
+            />
+        <Space
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"/>
         <TextView
             android:id="@+id/textViewSpeed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
 
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
-            android:drawableLeft="@drawable/ic_speed_black_24dp"
+            android:drawableStart="@drawable/ic_speed_black_24dp"
             android:gravity="center"
-            app:layout_constraintBottom_toTopOf="@+id/textViewTime"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textViewDistance"
-            app:layout_constraintVertical_bias="0.305" />
-
+            />
+        <Space
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"/>
         <TextView
             android:id="@+id/textViewTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="32dp"
-            android:drawableLeft="@drawable/ic_timer_black_24dp"
+
+            android:drawableStart="@drawable/ic_timer_black_24dp"
             android:gravity="center"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            />
+        <Space
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"/>
+    </androidx.appcompat.widget.LinearLayoutCompat>
 
 
 </RelativeLayout>

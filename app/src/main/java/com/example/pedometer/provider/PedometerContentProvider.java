@@ -128,7 +128,7 @@ public class PedometerContentProvider extends ContentProvider {
     private Cursor listStepsWeeks() {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        Cursor cursor = db.rawQuery("select _id, sum(StepsCount) as stepsCount, strftime('%W', datetime(creationdate/1000, 'unixepoch','localtime')) as weekNumber, sum(walkingtime/1000) as walkingTime from StepsSummary group by weekNumber;",null);
+        Cursor cursor = db.rawQuery("select _id,strftime('%Y', datetime(creationdate/1000, 'unixepoch','localtime')), sum(StepsCount) as stepsCount, strftime('%W', datetime(creationdate/1000, 'unixepoch','localtime')) as weekNumber, sum(walkingtime/1000) as walkingTime from StepsSummary group by weekNumber, strftime('%Y', datetime(creationdate/1000, 'unixepoch','localtime'))  order by weekNumber desc, strftime('%Y', datetime(creationdate/1000, 'unixepoch','localtime')) desc;",null);
         cursor.setNotificationUri(getContext().getContentResolver(), CONTENT_URI_WEEKS);
         return cursor;
     }

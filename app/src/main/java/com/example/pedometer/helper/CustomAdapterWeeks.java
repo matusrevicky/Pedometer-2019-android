@@ -14,6 +14,15 @@ import androidx.cursoradapter.widget.SimpleCursorAdapter;
 import com.example.pedometer.R;
 import com.example.pedometer.provider.Provider;
 
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.Locale;
+
 import static com.example.pedometer.helper.RandomMethods.roundAvoidD;
 import static com.example.pedometer.helper.RandomMethods.roundAvoidF;
 
@@ -69,12 +78,24 @@ public class CustomAdapterWeeks extends SimpleCursorAdapter {
         String stepC = cursor.getString(StepsCountIndex);
         String timeC = cursor.getString(TimeCountIndex);
 
-        date.setText("week: "+ mdate);
+        String temp = getWeek(mdate);
+
+
+        date.setText("week: "+temp );
         steps.setText("Steps:"+ stepC);
         distance.setText(calculateDistanceFromGenderAndHeight(Integer.parseInt(stepC))+"");
         speed.setText(calculateSpeed(Integer.parseInt(stepC),stepLenght,Long.parseLong(timeC))+"");
         calories.setText(calculateBurnedCalories(Integer.parseInt(stepC))+"");
         time.setText(Long.parseLong(timeC) +"");
+    }
+
+    private String getWeek(String mdate) {
+        DateTime dt = new DateTime()
+                .withWeekyear(2019)
+                .withWeekOfWeekyear(Integer.parseInt(mdate)+1)
+                .withDayOfWeek(1);
+        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("dd/MM/yyyy");
+        return (dateTimeFormatter.print(dt));
     }
 
     // https://livehealthy.chron.com/determine-stride-pedometer-height-weight-4518.html
