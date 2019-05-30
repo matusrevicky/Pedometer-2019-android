@@ -6,25 +6,29 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.SystemClock;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.JobIntentService;
 import androidx.core.app.NotificationCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.preference.PreferenceManager;
 
 import com.example.pedometer.fragments.HomeFragment;
 
-public class StepsIntentService extends IntentService {
+public class StepsIntentService extends JobIntentService {
 
 
     public StepsIntentService() {
-        super("StepsIntentService");
+        super();
     }
 
 
     @Override
-    protected void onHandleIntent(@Nullable Intent intent) {
+    protected void onHandleWork(@NonNull Intent intent) {
         long millis = SystemClock.elapsedRealtime();
         long minutes = millis / (1000 * 60);
 
@@ -50,9 +54,15 @@ public class StepsIntentService extends IntentService {
             notificationManager.createNotificationChannel(channel);
         }
 
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        String steps = prefs.getString("stepsCount", "0");
+
+
+
         Notification notification = new NotificationCompat.Builder(this, channelId)
-                .setContentTitle("Steps")
-                .setContentText("Steps " + uptimeMinutes + "steps")
+                .setContentTitle("Pedometer")
+                .setContentText("Do not forget to drink water!!!")
+                .setSubText("Current steps "+ steps)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentIntent(getPendingIntent())      // ak chcem po kliknuti spustit aktivitu
                 .build();

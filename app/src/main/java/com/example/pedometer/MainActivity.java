@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
 
         PendingIntent intent = PendingIntent.getService(this, 0, new Intent(this, StepsIntentService.class), 0);
-        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime(), 5*1000, intent);
+        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, SystemClock.elapsedRealtime(), 5*1000, intent);
     }
 
     @Override
@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
         mSensorService = new StepsService();
         mServiceIntent = new Intent(this,  mSensorService.getClass());
         if (!isMyServiceRunning(mSensorService.getClass())) {
-            if (android.os.Build.VERSION.SDK_INT >= 26){
+            if (android.os.Build.VERSION.SDK_INT >= 28){
                 startForegroundService(new Intent(this , StepsService.class));
             } else {
                 startService(new Intent(this , StepsService.class));}

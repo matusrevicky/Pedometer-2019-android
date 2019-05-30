@@ -101,6 +101,35 @@ public class HomeFragment extends Fragment implements LoaderManager.LoaderCallba
         speedTextView = v.findViewById(R.id.textViewSpeed);
         pauseButton = v.findViewById(R.id.button);
 
+        if (StepsService.restartServiceOnDestroy == true) {
+            pauseButton.setText("Start");
+            Toast.makeText(getActivity(), "Step counting paused", Toast.LENGTH_SHORT).show();
+        } else {
+            pauseButton.setText("Pause");
+            Toast.makeText(getActivity(), "Step counting running", Toast.LENGTH_SHORT).show();
+        }
+
+        // there were problems stopping endless service, this somehow works
+        pauseButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                StepsService.restartServiceOnDestroy = !StepsService.restartServiceOnDestroy;
+                if (StepsService.restartServiceOnDestroy == true) {
+                    pauseButton.setText("Start");
+                    Toast.makeText(getActivity(), "Step counting paused", Toast.LENGTH_SHORT).show();
+                } else {
+                    pauseButton.setText("Pause");
+                    Toast.makeText(getActivity(), "Step counting running", Toast.LENGTH_SHORT).show();
+                }
+
+                if (StepsService.restartServiceOnDestroy == true) {
+                    getActivity().stopService(new Intent(getActivity(), StepsService.class));
+                } else {
+                    getActivity().stopService(new Intent(getActivity(), StepsService.class));
+                }
+            }
+        });
+
         height = Double.parseDouble(sharedPreferences.getString("height", "170"));
         gender = sharedPreferences.getString("gender", "male");
         weight = Double.parseDouble(sharedPreferences.getString("weight", "50"));
@@ -120,24 +149,11 @@ public class HomeFragment extends Fragment implements LoaderManager.LoaderCallba
     }
 
 
-    private boolean isMyServiceRunning(Class<?> serviceClass) {
-        ActivityManager manager = (ActivityManager) getActivity().getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (serviceClass.getName().equals(service.service.getClassName())) {
-                Log.i ("isMyServiceRunning?", true+"");
-                return true;
-            }
-        }
-        Log.i ("isMyServiceRunning?", false+"");
-        return false;
-    }
-
-
     private void updateDisCalTime() {
         distanceTextView.setText(calculateDistanceFromGenderAndHeight() + "\nkm");
         caloriesTextView.setText(caloriesBurnedToday + "\nCal");
         timeTextView.setText(walkingTimeSeconds + "\nTime");
-        speedTextView.setText(walkingSpeedMetersPerSecond+ "\nm/s");
+        speedTextView.setText(walkingSpeedMetersPerSecond + "\nm/s");
     }
 
     // https://livehealthy.chron.com/determine-stride-pedometer-height-weight-4518.html
@@ -154,8 +170,8 @@ public class HomeFragment extends Fragment implements LoaderManager.LoaderCallba
 
     // https://www.womanandhome.com/health-and-wellbeing/calories-burned-walking-206766/
     private double calculateBurnedCalories() {
-        caloriesBurnedToday = (0.035 * weight ) + ((Math.pow(walkingSpeedMetersPerSecond,2)) / height/100) * (0.029) * (weight);
-        caloriesBurnedToday = caloriesBurnedToday * stepsToday/60;
+        caloriesBurnedToday = (0.035 * weight) + ((Math.pow(walkingSpeedMetersPerSecond, 2)) / height / 100) * (0.029) * (weight);
+        caloriesBurnedToday = caloriesBurnedToday * stepsToday / 60;
         return caloriesBurnedToday = roundAvoidD(caloriesBurnedToday, 3);
     }
 
@@ -177,8 +193,8 @@ public class HomeFragment extends Fragment implements LoaderManager.LoaderCallba
             stepsToday = Integer.parseInt(text);
 
             String walTime = cursor.getString(cursor.getColumnIndex(Provider.Pedometer.WALKING_TIME));
-            walkingTimeSeconds = Long.parseLong(walTime)/1000;
-            walkingSpeedMetersPerSecond = roundAvoidD(((stepLenght*stepsToday)/100d)/(Math.max(1,walkingTimeSeconds)),3);
+            walkingTimeSeconds = Long.parseLong(walTime) / 1000;
+            walkingSpeedMetersPerSecond = roundAvoidD(((stepLenght * stepsToday) / 100d) / (Math.max(1, walkingTimeSeconds)), 3);
 
             calculateBurnedCalories();
 
@@ -241,7 +257,7 @@ public class HomeFragment extends Fragment implements LoaderManager.LoaderCallba
         }
 
         if (hasCenterText2) {
-            data.setCenterText2("Goal "+stepsGoalToday);
+            data.setCenterText2("Goal " + stepsGoalToday);
             //cannot be applied
 //            int orientation = getActivity().getResources().getConfiguration().orientation;
 //            if (orientation == Configuration.ORIENTATION_LANDSCAPE) {

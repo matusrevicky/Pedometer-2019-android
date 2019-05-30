@@ -10,8 +10,9 @@ public class SensorRestarterBroadcastReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.i("LOPO", "Service Stops! Oooooooooooooppppssssss!!!!");
-        if (android.os.Build.VERSION.SDK_INT >= 26){
+        Log.i("EXIT", "Service Stops! Oooooooooooooppppssssss!!!!");
+
+        if (android.os.Build.VERSION.SDK_INT >= 28){
             context.startForegroundService(new Intent(context , StepsService.class));
         } else {
         context.startService(new Intent(context , StepsService.class));}

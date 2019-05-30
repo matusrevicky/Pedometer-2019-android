@@ -3,21 +3,25 @@
     <PreferenceCategory app:title="@string/messages_header">
 
         <EditTextPreference
+            app:icon="@drawable/ic_directions_run_black_24dp"
             app:key="goal"
             app:title="@string/signature_title"
             app:useSimpleSummaryProvider="true" />
 
         <EditTextPreference
+            app:icon="@drawable/ic_height_black_24dp"
             app:key="height"
             app:title="@string/height_title"
             app:useSimpleSummaryProvider="true" />
 
         <EditTextPreference
+            app:icon="@drawable/ic_weight_24dp"
             app:key="weight"
             app:title="@string/weight_title"
             app:useSimpleSummaryProvider="true" />
 
         <ListPreference
+            app:icon="@drawable/ic_gender_black_24dp"
             app:defaultValue="male"
             app:entries="@array/gender_entries"
             app:entryValues="@array/gender_values"

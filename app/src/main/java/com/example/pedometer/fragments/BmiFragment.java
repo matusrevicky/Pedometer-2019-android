@@ -20,12 +20,12 @@ import com.example.pedometer.R;
 // based on https://github.com/iamshz97/AndroidBMICalculator
 public class BmiFragment extends Fragment {
 
-    TextView weightTextView;
-    TextView heightTextView;
+    private TextView weightTextView;
+    private TextView heightTextView;
 
-    TextView BMITextVIew;
-    ImageView imageView;
-    CalculateBMI calculateBMI;
+    private TextView BMITextVIew;
+    private ImageView imageView;
+    private CalculateBMI calculateBMI;
 
     public BmiFragment() {
 
@@ -99,20 +99,20 @@ public class BmiFragment extends Fragment {
         private double inputkg;
 
 
-        public CalculateBMI(double centimeters, double inputkg) {
+        CalculateBMI(double centimeters, double inputkg) {
             this.inputCentimeters = centimeters;
             this.inputkg = inputkg;
         }
 
-        public double getInputCentimeters() {
+        double getInputCentimeters() {
             return inputCentimeters;
         }
 
-        public double getInputkg() {
+        double getInputkg() {
             return inputkg;
         }
 
-        public double camlculatebmi(double inputkg, double inputCentimeters) {
+        double camlculatebmi(double inputkg, double inputCentimeters) {
             double result = 0;
 
             double txtheightm = (inputCentimeters) / 100;
@@ -126,7 +126,7 @@ public class BmiFragment extends Fragment {
 
         }
 
-        public String getbmitype(double bmi) {
+        String getbmitype(double bmi) {
             String type = "null";
 
             if (bmi <= 18.5) {

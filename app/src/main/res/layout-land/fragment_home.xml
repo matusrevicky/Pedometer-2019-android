@@ -23,7 +23,7 @@
 
 
         <Space
-            android:layout_weight="1"
+            android:layout_weight="0.5"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"/>
         <TextView
@@ -79,7 +79,22 @@
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"/>
+        <Button
+            android:id="@+id/button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/linear"
+            android:layout_marginBottom="5dp"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            android:text="Play/pause" />
+        <Space
+            android:layout_weight="0.5"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"/>
+
     </androidx.appcompat.widget.LinearLayoutCompat>
+
 
 
 </RelativeLayout>

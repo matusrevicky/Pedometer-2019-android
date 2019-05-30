@@ -5,6 +5,7 @@ import android.content.AsyncQueryHandler;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.hardware.Sensor;
@@ -14,6 +15,8 @@ import android.hardware.SensorManager;
 import android.os.IBinder;
 import android.util.Log;
 
+import androidx.preference.PreferenceManager;
+
 import com.example.pedometer.helper.TimeHelper;
 import com.example.pedometer.provider.PedometerContentProvider;
 import com.example.pedometer.provider.Provider;
@@ -22,6 +25,8 @@ import com.example.pedometer.provider.StepsDBHelper;
 import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import static com.example.pedometer.provider.Provider.Pedometer.STEPS_COUNT;
 
 
 // based on https://hub.packtpub.com/step-detector-and-step-counters-sensors/#more
@@ -35,11 +40,12 @@ public class StepsService extends Service implements SensorEventListener {
 
     private long lastStepTimeMillies = 0;
     private long thisStepTimeMillies = 0;
+    public static boolean restartServiceOnDestroy = false;
 
 
     public StepsService() {
         super();
-        Log.i("HERE", "here I am!");
+        Log.i("EXIT", "here I am!");
     }
 
 
@@ -50,7 +56,11 @@ public class StepsService extends Service implements SensorEventListener {
         mSensorManager = (SensorManager) this.getSystemService(Context.SENSOR_SERVICE);
         if (mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR) != null) {
             mStepDetectorSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
-            mSensorManager.registerListener(this, mStepDetectorSensor, SensorManager.SENSOR_DELAY_NORMAL);
+
+            if (!StepsService.restartServiceOnDestroy) {
+                mSensorManager.registerListener(this, mStepDetectorSensor, SensorManager.SENSOR_DELAY_NORMAL);
+            }
+
             mStepsDBHelper = new StepsDBHelper(this);
         }
     }
@@ -64,8 +74,8 @@ public class StepsService extends Service implements SensorEventListener {
         long currentWalkingTimeMillies = 0;
         long walkingTimeDifference = 0;
         if (thisStepTimeMillies - lastStepTimeMillies < 2000) {
-            Log.i("STEP",walkingTimeDifference+"");
-            walkingTimeDifference =  (thisStepTimeMillies - lastStepTimeMillies);
+            Log.i("STEP", walkingTimeDifference + "");
+            walkingTimeDifference = (thisStepTimeMillies - lastStepTimeMillies);
         }
 
         lastStepTimeMillies = thisStepTimeMillies;
@@ -81,14 +91,14 @@ public class StepsService extends Service implements SensorEventListener {
         // gets stepcount from today, if exists
         try {
             SQLiteDatabase db = mStepsDBHelper.getReadableDatabase();
-            Cursor c = db.query(Provider.Pedometer.TABLE_STEPS_SUMMARY, new String[]{Provider.Pedometer.STEPS_COUNT, Provider.Pedometer.WALKING_TIME},
+            Cursor c = db.query(Provider.Pedometer.TABLE_STEPS_SUMMARY, new String[]{STEPS_COUNT, Provider.Pedometer.WALKING_TIME},
                     Provider.Pedometer.CREATION_DATE + " = ?", new String[]{todayDate + ""}, null, null, null);
             if (c.moveToFirst()) {
                 do {
                     isDateAlreadyPresent = true;
-                    currentDateStepCounts = c.getInt((c.getColumnIndex(Provider.Pedometer.STEPS_COUNT)));
+                    currentDateStepCounts = c.getInt((c.getColumnIndex(STEPS_COUNT)));
                     currentWalkingTimeMillies = c.getLong((c.getColumnIndex(Provider.Pedometer.WALKING_TIME)));
-                    Log.i("testovanie","current "+ currentWalkingTimeMillies);
+                    Log.i("testovanie", "current " + currentWalkingTimeMillies);
                 } while (c.moveToNext());
             }
             db.close();
@@ -102,15 +112,17 @@ public class StepsService extends Service implements SensorEventListener {
             ContentValues values = new ContentValues();
             values.put(Provider.Pedometer.CREATION_DATE, todayDate);
             if (isDateAlreadyPresent) {
-                values.put(Provider.Pedometer.STEPS_COUNT, ++currentDateStepCounts);
+                values.put(STEPS_COUNT, ++currentDateStepCounts);
                 values.put(Provider.Pedometer.WALKING_TIME, currentWalkingTimeMillies + walkingTimeDifference);
-                AsyncQueryHandler handler = new AsyncQueryHandler(getContentResolver()) {};
+                AsyncQueryHandler handler = new AsyncQueryHandler(getContentResolver()) {
+                };
                 handler.startUpdate(0, null, PedometerContentProvider.CONTENT_URI, values, Provider.Pedometer.CREATION_DATE + " =?", new String[]{todayDate + ""});
                 db.close();
             } else {
-                values.put(Provider.Pedometer.STEPS_COUNT, 1);
+                values.put(STEPS_COUNT, 1);
                 values.put(Provider.Pedometer.WALKING_TIME, 0);
-                AsyncQueryHandler handler = new AsyncQueryHandler(getContentResolver()) {};
+                AsyncQueryHandler handler = new AsyncQueryHandler(getContentResolver()) {
+                };
                 handler.startInsert(0, null, PedometerContentProvider.CONTENT_URI, values);
                 db.close();
             }
@@ -118,6 +130,12 @@ public class StepsService extends Service implements SensorEventListener {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString("stepsCount", currentDateStepCounts+"");
+        editor.apply();
+
         return createSuccessful;
     }
 
@@ -151,11 +169,11 @@ public class StepsService extends Service implements SensorEventListener {
 
     @Override
     public void onDestroy() {
-
         Log.i("EXIT", "ondestroy!");
         Intent broadcastIntent = new Intent(getApplicationContext(), SensorRestarterBroadcastReceiver.class);
         sendBroadcast(broadcastIntent);
         stoptimertask();
+        mSensorManager.unregisterListener(this, mStepDetectorSensor);
     }
 
     @Override
@@ -164,6 +182,7 @@ public class StepsService extends Service implements SensorEventListener {
         Intent broadcastIntent = new Intent(getApplicationContext(), SensorRestarterBroadcastReceiver.class);
         sendBroadcast(broadcastIntent);
         stoptimertask();
+        mSensorManager.unregisterListener(this, mStepDetectorSensor);
     }
 
     @Override
